@@ -1,0 +1,13 @@
+{
+  "name": "java-code-consultant",
+  "owner": {
+    "name": "BlueMush"
+  },
+  "plugins": [
+    {
+      "name": "java21-conventions",
+      "source": "./plugins/java21-conventions",
+      "description": "Java 21 코드 작성규칙 — 모던 이디엄, 테스트 컨벤션, Spring Boot 3.5 관례, 기능 분해 기준"
+    }
+  ]
+}
