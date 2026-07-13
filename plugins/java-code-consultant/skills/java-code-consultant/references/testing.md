@@ -50,6 +50,10 @@ assertThatThrownBy(() -> calculator.discountOf(coupon, -1L))
 
 - `assertThrows`(JUnit) 대신 `assertThatThrownBy`/`assertThatIllegalArgumentException`.
 - 예외 **타입만이 아니라 메시지 일부**까지 검증해 엉뚱한 지점의 동일 타입 예외를 걸러낸다.
+- **예외가 SUT에서 나는지 확인한다.** 준비 코드가 먼저 예외를 던지면 통과처럼 보여도 무효
+  테스트다. 대표 함정: `List.of(null)`은 SUT 호출 전에 리스트 생성 단계에서 NPE를 던진다 —
+  null 원소 케이스는 `Collections.singletonList(null)` 또는 `Arrays.asList((T) null)`로 만든다.
+  람다 안에는 **SUT 호출 한 줄만** 넣고 준비 코드는 밖으로 뺀다.
 
 ## 경계값 — @ParameterizedTest
 
@@ -77,6 +81,8 @@ void 정률_할인_경계(long price, int rateBp, long expected) {
 - 값 객체·도메인 로직·계산기는 절대 mock 하지 않는다 — 실물을 만든다.
 - `@ExtendWith(MockitoExtension.class)` + `@Mock`/`@InjectMocks`. 수동 `Mockito.mock()`은 지역적 필요 시에만.
 - stubbing은 테스트가 실제로 쓰는 것만(strict stubbing이 기본이므로 불필요 stub은 실패한다 — 억지로 `lenient()` 붙이지 말고 stub을 지운다).
+- 스터빙 스타일은 한 코드베이스에서 하나로: `when().thenReturn()` 또는 BDDMockito
+  `given().willReturn()` 중 팀이 정한 쪽만. 한 파일 안 혼용 금지.
 - 상호작용 검증(`verify`)은 **부수효과가 계약인 경우**(발행, 저장 호출)만. 반환값으로 검증
   가능한 것을 verify로 중복 검증하지 않는다.
 - 시간 의존 로직은 `Clock`을 주입받게 만들고 테스트에선 `Clock.fixed(...)`.
@@ -91,3 +97,5 @@ void 정률_할인_경계(long price, int rateBp, long expected) {
 - 순수 로직은 스프링 컨텍스트 없이 순수 단위 테스트(가장 빠름, 기본값).
 - 웹 계층은 `@WebMvcTest`, JPA 매핑·쿼리는 `@DataJpaTest`, 전체 와이어링 확인만 `@SpringBootTest`.
 - `@SpringBootTest`를 단위 테스트 대용으로 쓰지 않는다(느림 + 실패 원인 흐려짐).
+- 슬라이스에서 빈 대체는 **`@MockitoBean`/`@MockitoSpyBean`** (Spring Framework 6.2 /
+  Boot 3.4+). 구 `@MockBean`/`@SpyBean`은 deprecated — 신규 코드 사용 금지, 리뷰 시 교체 지적.

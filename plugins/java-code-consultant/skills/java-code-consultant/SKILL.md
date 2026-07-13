@@ -1,7 +1,7 @@
 ---
 name: java-code-consultant
 description: Java 21 코드 작성규칙. Java 코드를 작성·리뷰·리팩터링할 때 적용 — 모던 이디엄(record/sealed/pattern matching), JUnit5+AssertJ+Mockito 테스트 컨벤션, Spring Boot 3.5 관례, 기능 분해 기준.
-paths: "**/*.java"
+when_to_use: 자바/Spring 코드 작성, .java 파일 생성·수정, 테스트 작성, 코드 리뷰, 리팩터링 요청 시. Use when writing, reviewing, or refactoring any Java code (Java 21, Spring Boot 3.5, JUnit 5 + AssertJ + Mockito).
 ---
 
 # Java 21 코드 작성규칙
@@ -24,21 +24,30 @@ Java 코드를 **작성·수정·리뷰**할 때 아래 규칙을 적용한다. 
 3. **`Optional`은 반환 타입 전용.** 필드·파라미터·컬렉션 원소에 쓰지 않는다. `null` 반환 금지.
 4. **`var`는 우변에 타입이 명백할 때만.** 메서드 호출 결과처럼 타입이 안 보이면 명시 선언.
 5. **금액은 `long`(원 단위) 또는 `BigDecimal`.** `double`/`float` 금액 표현은 절대 금지 — 발견 시 즉시 지적하고 반올림 정책(`RoundingMode`)을 명시하게 한다.
+6. **preview 기능 금지.** `--enable-preview` 프로덕션 사용 불가 (String Template은 JDK 23에서 제거됨).
 
 ### 테스트
-6. **AssertJ `assertThat` 통일.** `assertEquals`·`assertTrue` 등 JUnit assertion 금지.
-7. **given–when–then 구조 + 한글 `@DisplayName`.** 경계값은 `@ParameterizedTest`로.
-8. **모킹 최소화.** 값 객체·순수 로직은 실물 사용, mock은 외부 I/O 경계에만.
+7. **AssertJ `assertThat` 통일.** `assertEquals`·`assertTrue` 등 JUnit assertion 금지.
+8. **given–when–then 구조 + 한글 `@DisplayName`.** 경계값은 `@ParameterizedTest`로.
+9. **모킹 최소화.** 값 객체·순수 로직은 실물 사용, mock은 외부 I/O 경계에만. 빈 대체는 `@MockitoBean`(구 `@MockBean`은 deprecated).
 
 ### Spring
-9. **생성자 주입만.** 필드 `@Autowired` 금지. 단일 생성자면 어노테이션 생략.
-10. **Controller는 얇게.** 도메인 로직은 도메인 객체/서비스로. 예외는 `@RestControllerAdvice` + `ProblemDetail`.
+10. **생성자 주입만.** 필드 `@Autowired` 금지. 단일 생성자면 어노테이션 생략.
+11. **Controller는 얇게.** 도메인 로직은 도메인 객체/서비스로. 예외는 `@RestControllerAdvice` + `ProblemDetail`.
 
 ### 구조
-11. **메서드는 한 추상화 수준.** 이름 하나로 요약되지 않으면 분해. 중첩은 early return으로 제거.
-12. **패키지는 도메인 기준**(주문/정산/쿠폰...), 기술 계층(controller/service/repository) 기준이 아니다.
+12. **메서드는 한 추상화 수준.** 이름 하나로 요약되지 않으면 분해. 중첩은 early return으로 제거.
+13. **패키지는 도메인 기준**(주문/정산/쿠폰...), 기술 계층(controller/service/repository) 기준이 아니다.
 
 ## 리뷰 시 동작
 
-기존 코드를 리뷰할 때는 위 규칙 위반을 지적하되, **동작 변경 없는 스타일 지적과 버그 가능성이
-있는 위반(금액 부동소수점, null 반환, 가변 컬렉션 노출)을 구분**해서 후자를 우선 보고한다.
+- **버그 가능성 위반**(금액 부동소수점, null 반환, 가변 컬렉션 노출, SUT 밖에서 예외가 나는
+  무효 테스트)과 **스타일 위반**을 구분하고, 전자를 먼저 보고한다.
+- 각 지적에는 근거 규칙(references 파일·항목)과 `파일:줄` 위치를 함께 인용한다.
+- 리뷰만 요청받았으면 코드를 고치지 않는다. 수정은 명시적 요청이 있을 때만.
+
+## 기존 코드 수정 시 (레거시 일관성)
+
+새로 작성·수정하는 부분에는 규칙을 적용하되, **변경 범위 밖 코드를 규칙에 맞추려고 파일
+전체를 리라이트하지 않는다** — 범위 밖 위반은 지적만 남긴다. 주변 코드와 규칙이 정면충돌하는
+경우(예: 파일 전체가 필드 주입) 그 파일 안에서는 기존 스타일을 따르고 위반 사실을 보고한다.

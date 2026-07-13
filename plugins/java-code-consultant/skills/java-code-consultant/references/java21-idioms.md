@@ -38,6 +38,8 @@ long discountOf(Coupon coupon, long price) {
 - `instanceof` 체인이 2개 이상이면 sealed+switch 전환 신호.
 - record 패턴으로 분해 가능: `case RateCoupon(var id, int rateBp) -> ...`
 - 문자열/enum 분기도 switch **식**(expression) 우선 — 문장형 switch + break 금지.
+- **enum vs sealed**: 케이스에 고유 데이터·행동이 없으면 enum(switch 완전성 검사 동일),
+  케이스별 필드나 로직이 다르면 sealed. enum 상수마다 필드·분기가 붙기 시작하면 sealed 전환 검토.
 
 ## Optional
 
@@ -58,6 +60,23 @@ long discountOf(Coupon coupon, long price) {
 - record 생성자에서도 방어 복사: `this.items = List.copyOf(items);`
 - `Collections.unmodifiableList`보다 `List.copyOf` 우선(원본 변경에도 안전).
 - 상수 컬렉션은 `List.of` / `Map.of`.
+- **주의: `List.of`/`Map.of`/`List.copyOf`는 null 원소·키·값 불허**(생성 시점 즉시 NPE).
+  null이 섞일 수 있는 데이터에 쓰지 않는다. null 허용이 정말 필요한지부터 의심하고,
+  불가피하면 `Collections.unmodifiableList(new ArrayList<>(...))`. 테스트에서의 함정은 testing.md 참조.
+
+## SequencedCollection (Java 21 신기능)
+
+- 첫/끝 원소는 `list.getFirst()` / `list.getLast()` — `list.get(0)`,
+  `list.get(list.size() - 1)` 패턴을 대체한다.
+- 역순 순회는 `list.reversed()` (복사 없는 뷰). `LinkedHashSet`·`LinkedHashMap`도 지원
+  (`SequencedSet`/`SequencedMap`).
+
+## Preview 기능 금지
+
+- 프로덕션 코드에 `--enable-preview` 금지. preview API는 마이너 업그레이드에서도 바뀌거나 사라진다.
+- 실례: String Template(JEP 430, JDK 21 preview)은 **JDK 23에서 제거**됐다. 문자열 조립은
+  text block + `formatted()` 또는 StringBuilder로.
+- JDK 21 기준 ScopedValue·Structured Concurrency도 preview — 정식(GA) 전까지 사용 금지.
 
 ## Stream vs for
 
