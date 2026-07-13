@@ -41,7 +41,8 @@ public Receipt applyCoupons(Order order, List<Coupon> coupons) {
 ## 패키지
 
 - **도메인 기준으로 자른다**: `coupon/`, `order/`, `settlement/` — 기술 계층 기준(`controller/`, `service/`, `repository/` 최상위) 금지.
-- 계층은 도메인 패키지 **안에서** 나눈다: `coupon/api/`, `coupon/application/`, `coupon/domain/`.
+- 계층은 도메인 패키지 **안에서** 나눈다 — 구조는 layers.md의 패키지 표준
+  (`adapter/in·out`, `application/port·service`, `domain`)을 따른다.
 - 패키지 간 참조는 단방향 유지. 순환 참조가 생기면 공용 개념을 별도 패키지로 내리거나 이벤트로 결합을 끊는다.
 - 다른 도메인 패키지의 내부(domain/repository)를 직접 참조하지 않는다 — 공개 서비스/이벤트를 통해서만.
 

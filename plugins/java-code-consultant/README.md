@@ -6,8 +6,10 @@ Claude가 자동으로 규칙을 적용한다.
 ## 담긴 규칙
 
 - **Java 21 모던 이디엄** — record, sealed + pattern matching, SequencedCollection, Optional/var 규칙, 불변 우선, virtual thread 주의점, preview 기능 금지, 금액 long/BigDecimal 표준
+- **클린 아키텍처 계층 규칙** — Controller / UseCase(인바운드 포트) / Service / OutPort(아웃바운드 포트) / Adapter / 계층별 DTO(Request·Command·Result·Response) 각각의 세부 규칙과 의존 방향
+- **네이밍 규칙** — 계층 접미사 표, 메서드 동사 사전, 단위 접미사(amountWon·rateBp), 축약 금지, 도메인 용어집
 - **테스트 컨벤션** — JUnit5 + AssertJ + Mockito: assertThat 통일, given-when-then, @ParameterizedTest 경계값, 모킹 최소화, @MockitoBean(구 @MockBean 대체), 무효 테스트 함정(List.of(null))
-- **Spring Boot 3.5 관례** — 생성자 주입, @ConfigurationProperties record, 계층 책임, ProblemDetail 예외 처리, RestClient, 트랜잭션 경계, OSIV off
+- **Spring Boot 3.5 관례** — 생성자 주입, @ConfigurationProperties record, ProblemDetail 예외 처리, RestClient, 트랜잭션 경계, OSIV off
 - **기능 분해 기준** — 메서드/클래스/패키지를 어디서 자를지, 리팩터링 신호 체크리스트
 
 핵심 규칙은 [skills/java-code-consultant/SKILL.md](skills/java-code-consultant/SKILL.md),

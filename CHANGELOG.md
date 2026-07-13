@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.0 — 2026-07-14
+
+- `references/layers.md` 추가 — 클린 아키텍처 계층별 세부 규칙: Controller / UseCase(인바운드
+  포트, 인터페이스당 메서드 1개) / Service(package-private, 유스케이스당 하나) / OutPort(Load·Save
+  분리, 도메인 타입만) / Adapter(JPA 엔티티 반출 금지) / DTO(계층별 접미사, 계층 간 재사용 금지).
+- `references/naming.md` 추가 — 클래스 접미사 표, 메서드 동사 사전(find/get/load/issue...),
+  단위 접미사(amountWon·rateBp), 축약 금지 목록, 도메인 용어집 시드, Impl·Util 금지.
+- SKILL.md 핵심 규칙 13→15개: 의존 방향(안쪽으로만)·계층별 DTO 변환, 계층·단위 네이밍 추가.
+- 기존 파일 정합: spring-boot.md 계층 책임을 layers.md 참조 요약으로, decomposition.md 패키지
+  예시를 layers.md 표준으로 통일.
+- 스모크 확장: PointController.java 픽스처(계층·네이밍 위반 7종) + 검사 항목 8→11개.
+
 ## 0.2.0 — 2026-07-14
 
 - `paths` frontmatter 제거: 신규 .java 파일 생성 요청에서 스킬이 로드되지 않을 수 있는 위험 제거.

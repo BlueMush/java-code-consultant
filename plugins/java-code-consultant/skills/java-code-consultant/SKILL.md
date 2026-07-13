@@ -13,7 +13,9 @@ Java 코드를 **작성·수정·리뷰**할 때 아래 규칙을 적용한다. 
 |---|---|
 | 클래스·도메인 모델·비즈니스 로직 작성 | [references/java21-idioms.md](references/java21-idioms.md) |
 | 테스트 작성·수정 | [references/testing.md](references/testing.md) |
-| Controller/Service/설정 등 Spring 코드 | [references/spring-boot.md](references/spring-boot.md) |
+| Spring 설정·트랜잭션·예외 처리·HTTP 클라이언트 | [references/spring-boot.md](references/spring-boot.md) |
+| Controller/UseCase/Service/OutPort/Adapter/DTO 작성 | [references/layers.md](references/layers.md) |
+| 클래스·메서드·변수 이름 짓기 | [references/naming.md](references/naming.md) |
 | 메서드·클래스·패키지 구조 설계, 리팩터링 | [references/decomposition.md](references/decomposition.md) |
 
 ## 핵심 규칙 (항상 적용)
@@ -31,13 +33,18 @@ Java 코드를 **작성·수정·리뷰**할 때 아래 규칙을 적용한다. 
 8. **given–when–then 구조 + 한글 `@DisplayName`.** 경계값은 `@ParameterizedTest`로.
 9. **모킹 최소화.** 값 객체·순수 로직은 실물 사용, mock은 외부 I/O 경계에만. 빈 대체는 `@MockitoBean`(구 `@MockBean`은 deprecated).
 
-### Spring
+### Spring · 계층
 10. **생성자 주입만.** 필드 `@Autowired` 금지. 단일 생성자면 어노테이션 생략.
-11. **Controller는 얇게.** 도메인 로직은 도메인 객체/서비스로. 예외는 `@RestControllerAdvice` + `ProblemDetail`.
+11. **Controller는 얇게.** 검증→Command 변환→Response 변환만. 예외는 `@RestControllerAdvice` + `ProblemDetail`.
+12. **의존은 안쪽으로만(클린 아키텍처).** Controller는 UseCase 인터페이스에, Service는 OutPort
+    인터페이스에 의존. 엔티티·도메인 객체를 API로 노출하지 않고 계층별 DTO
+    (Request→Command→Result→Response)로 변환한다.
 
-### 구조
-12. **메서드는 한 추상화 수준.** 이름 하나로 요약되지 않으면 분해. 중첩은 early return으로 제거.
-13. **패키지는 도메인 기준**(주문/정산/쿠폰...), 기술 계층(controller/service/repository) 기준이 아니다.
+### 구조 · 네이밍
+13. **메서드는 한 추상화 수준.** 이름 하나로 요약되지 않으면 분해. 중첩은 early return으로 제거.
+14. **패키지는 도메인 기준**(주문/정산/쿠폰...), 그 안에서 adapter/application/domain 분리.
+15. **이름에 계층과 단위가 드러나게.** 클래스는 계층 접미사(`UseCase`/`Service`/`OutPort`/
+    `Adapter`/`Request`...), 금액·비율 변수는 단위 접미사(`amountWon`, `rateBp`). URL에 동사 금지.
 
 ## 리뷰 시 동작
 

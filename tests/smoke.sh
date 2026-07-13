@@ -12,7 +12,7 @@ cp "$ROOT"/tests/fixtures/*.java "$WORK/"
 
 echo "[smoke] 리뷰 실행 중... (작업 디렉터리: $WORK)"
 OUT="$(cd "$WORK" && claude --plugin-dir "$PLUGIN" \
-  -p "PointService.java 와 PointServiceTest.java 를 리뷰해줘. 수정하지 말고 지적만." \
+  -p "PointController.java, PointService.java, PointServiceTest.java 를 리뷰해줘. 수정하지 말고 지적만." \
   --permission-mode plan 2>&1)"
 
 echo "$OUT"
@@ -35,6 +35,9 @@ check "null 반환 지적"            "null"
 check "JUnit assertion 지적"      "assertEquals|AssertJ|assertThat"
 check "@MockBean deprecated 지적" "MockitoBean|MockBean"
 check "List.of\(null\) 함정 지적" "List\.of|무효"
+check "엔티티 응답 노출 지적"     "엔티티|JpaEntity"
+check "컨트롤러 로직 지적"        "분기|비즈니스 로직|유스케이스|UseCase"
+check "URL/네이밍 지적"           "getPoint|동사|네이밍|이름"
 check "버그/스타일 구분 준수"     "버그"
 
 if [ "$fail" -eq 0 ]; then

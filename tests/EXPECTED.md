@@ -1,6 +1,6 @@
 # 스모크 테스트 기대 결과
 
-`fixtures/`의 두 파일에는 규칙 위반이 의도적으로 심어져 있다. 스킬이 정상 발동하면
+`fixtures/`의 세 파일에는 규칙 위반이 의도적으로 심어져 있다. 스킬이 정상 발동하면
 리뷰가 아래 위반을 잡아야 한다. `smoke.sh`는 이 중 핵심 신호를 키워드로 검사한다.
 
 ## PointService.java (심은 위반 6개)
@@ -23,5 +23,17 @@
 | 3 | `@MockBean` (deprecated) | SKILL 9, testing "슬라이스 vs 통합" |
 | 4 | 단위 테스트에 `@SpringBootTest` | testing "슬라이스 vs 통합" |
 | 5 | `testCalculate` 같은 무의미한 이름, `@DisplayName` 없음 | SKILL 8, testing "기본 구조" |
+
+## PointController.java (심은 위반 7개 — 계층·네이밍 규칙)
+
+| # | 위반 | 근거 규칙 |
+|---|---|---|
+| 1 | JPA 엔티티(`PointJpaEntity`)를 응답으로 직접 반환 | SKILL 12, layers "Controller" |
+| 2 | 컨트롤러에 등급 분기 비즈니스 로직 | SKILL 11, layers "Controller" |
+| 3 | URL에 동사(`/getPoint`) + 리소스 기준 아님 | SKILL 15, layers "Controller" |
+| 4 | `Map<String, Object>` 응답 — Response record 부재 | layers "DTO 규칙" |
+| 5 | Service 구체 클래스 의존 — UseCase 인터페이스 부재 | SKILL 12, layers "UseCase" |
+| 6 | `double` 금액 파라미터 | SKILL 5 |
+| 7 | `doCalc`·`res` 등 네이밍 위반, 등급 문자열 하드코딩(enum 후보) | naming "메서드 동사 사전", "축약 금지" |
 
 주의: 리뷰 출력이 위 표현과 정확히 일치할 필요는 없다 — 같은 문제를 지적하면 통과.

@@ -32,12 +32,12 @@ public record CouponProperties(int maxStack, long dailyCapWon, Duration reserveT
 - `@EnableConfigurationProperties(CouponProperties.class)` 또는 `@ConfigurationPropertiesScan`으로 등록.
 - 검증이 필요하면 compact constructor 또는 `@Validated` + Bean Validation.
 
-## 계층 책임
+## 계층 책임 (요약 — 상세는 layers.md)
 
-- **Controller**: 요청 파싱/검증(`@Valid`) → 서비스 호출 → 응답 DTO 변환. 분기·계산 금지.
-- **Service**: 유스케이스 오케스트레이션 + 트랜잭션 경계. 도메인 규칙 자체는 도메인 객체로.
+- **Controller**: 요청 파싱/검증(`@Valid`) → UseCase 호출 → 응답 DTO 변환. 분기·계산 금지.
+- **Service**: UseCase 구현, 오케스트레이션 + 트랜잭션 경계. 도메인 규칙 자체는 도메인 객체로.
 - **도메인**: 규칙·계산·상태 전이. 스프링 어노테이션 없는 순수 자바 — 단위 테스트가 가장 쉬운 곳.
-- 요청/응답 DTO는 record, Controller 패키지 소속. 엔티티를 API로 직접 노출하지 않는다.
+- 계층별 DTO(Request/Command/Result/Response)와 포트 규칙은 layers.md, 접미사는 naming.md.
 
 ## 예외 처리 — @RestControllerAdvice + ProblemDetail
 
