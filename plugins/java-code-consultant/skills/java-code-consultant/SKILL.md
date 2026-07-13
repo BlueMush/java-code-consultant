@@ -1,5 +1,5 @@
 ---
-name: java21-conventions
+name: java-code-consultant
 description: Java 21 코드 작성규칙. Java 코드를 작성·리뷰·리팩터링할 때 적용 — 모던 이디엄(record/sealed/pattern matching), JUnit5+AssertJ+Mockito 테스트 컨벤션, Spring Boot 3.5 관례, 기능 분해 기준.
 paths: "**/*.java"
 ---
