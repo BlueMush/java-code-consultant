@@ -68,6 +68,7 @@ public class ApiExceptionHandler {
 
 - `@Transactional`은 **Service의 public 메서드**에. Controller·Repository 계층엔 붙이지 않는다.
 - 조회 전용은 `@Transactional(readOnly = true)`.
+- **롤백은 unchecked만.** `RuntimeException`·`Error`는 롤백하지만 **checked `Exception`은 롤백하지 않고 커밋**된다(Spring 기본값). 도메인 예외를 unchecked로 던지는 규칙(예외 처리 절)이 이 함정의 1차 방어다. checked까지 롤백하려면 메서드에 `@Transactional(rollbackFor = Exception.class)`, 또는 전역으로 `@EnableTransactionManagement(rollbackOn = ALL_EXCEPTIONS)`(Spring 6.2+ = Boot 3.5.x 번들 6.2.x에서 사용 가능).
 - 트랜잭션 안에서 외부 API 호출·메시지 발행 금지 — 커밋 후 처리(`@TransactionalEventListener`,
   기본 phase가 `AFTER_COMMIT`)로 분리. DB 커넥션을 외부 지연에 볼모로 잡히지 않게 한다.
 - self-invocation(같은 클래스 내부 호출)엔 프록시가 안 걸린다 — 트랜잭션 경계가 필요한 메서드는 다른 빈으로 분리.

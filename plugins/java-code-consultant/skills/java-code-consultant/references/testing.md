@@ -99,3 +99,14 @@ void 정률_할인_경계(long price, int rateBp, long expected) {
 - `@SpringBootTest`를 단위 테스트 대용으로 쓰지 않는다(느림 + 실패 원인 흐려짐).
 - 슬라이스에서 빈 대체는 **`@MockitoBean`/`@MockitoSpyBean`** (Spring Framework 6.2 /
   Boot 3.4+). 구 `@MockBean`/`@SpyBean`은 deprecated — 신규 코드 사용 금지, 리뷰 시 교체 지적.
+- **슬라이스는 한 클래스에 하나만.** `@WebMvcTest`+`@DataJpaTest`를 한 테스트에 함께 붙이는
+  조합은 지원되지 않는다 — 하나를 고르고 필요한 자동설정은 `@AutoConfigure...`로 개별 추가한다.
+  (JUnit 5에선 `@SpringBootTest`·슬라이스 애노테이션에 `SpringExtension`이 내장돼 있어
+  별도 `@ExtendWith(SpringExtension.class)`가 필요 없다.)
+
+## 트랜잭션 테스트 함정
+
+- `@Transactional`을 붙인 테스트는 각 메서드 종료 시 **자동 롤백**(DB가 깨끗이 유지된다).
+- **함정: `@SpringBootTest(webEnvironment = RANDOM_PORT/DEFINED_PORT)`에서는 롤백되지 않는다.**
+  HTTP 클라이언트와 서버가 별도 스레드 = 별도 트랜잭션이라 서버 측 커밋이 남는다 —
+  이런 통합 테스트는 `@Transactional`에 기대지 말고 `@Sql`/`deleteAll` 등으로 명시 정리한다.

@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.1 — 2026-07-16
+
+- `references/spring-boot.md` 트랜잭션 절 보강 — checked `Exception`은 기본 롤백되지 않고 커밋되는
+  함정 + `rollbackFor`/`@EnableTransactionManagement(rollbackOn = ALL_EXCEPTIONS)`(Spring 6.2+,
+  Boot 3.5.x 번들) 대응 명시.
+- `references/testing.md` 슬라이스 절 보강 — 한 테스트에 여러 `@…Test` 슬라이스 조합 미지원
+  (하나 선택 + `@AutoConfigure…` 개별 추가), JUnit 5에서 `@ExtendWith(SpringExtension.class)` 불필요.
+- `references/testing.md` "트랜잭션 테스트 함정" 절 신규 — `@Transactional` 테스트 자동 롤백이
+  `RANDOM_PORT`/`DEFINED_PORT` 통합 테스트에서는 서버가 별도 트랜잭션이라 롤백되지 않음 → 명시 정리.
+- 근거: deep-research 3회 교차검증(docs.spring.io 1차 출처). 상세는 리서치 보고서 참조.
+
 ## 0.3.0 — 2026-07-14
 
 - `references/layers.md` 추가 — 클린 아키텍처 계층별 세부 규칙: Controller / UseCase(인바운드

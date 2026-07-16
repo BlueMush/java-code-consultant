@@ -1,7 +1,7 @@
 {
   "name": "java-code-consultant",
   "displayName": "Java Code Consultant",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Java 21 코드 작성규칙: 모던 이디엄(record/sealed/pattern matching), 클린 아키텍처 계층(Controller/UseCase/Service/OutPort/Adapter/DTO), 네이밍, JUnit5+AssertJ+Mockito 테스트 컨벤션, Spring Boot 3.5 관례, 기능 분해 기준. /java-code-consultant:review 커맨드 포함",
   "author": {
     "name": "BlueMush"
