@@ -1,14 +1,14 @@
 ---
 name: clean
 description: 클린 아키텍처(Uncle Bob) 계층 규칙 — entity/usecase/adapter/framework 4계층, 의존성 규칙, 입력·출력 경계(Boundary)·프레젠터, 경계 횡단 DTO, 가시성·경계 강제. Clean Architecture layer conventions.
-when_to_use: 프로젝트가 Uncle Bob 클린 아키텍처(동심원 4계층 — Entities/Use Cases/Interface Adapters/Frameworks)일 때 계층·패키지 설계, 인터랙터/경계/프레젠터/게이트웨이 작성·리뷰 시 명시 호출(java-code-consultant:clean). 공통 Java 규칙(이디엄·네이밍·테스트·Spring·분해)은 java-code-consultant 스킬이 담당한다.
+when_to_use: 프로젝트가 Uncle Bob 클린 아키텍처(동심원 4계층 — Entities/Use Cases/Interface Adapters/Frameworks)일 때 계층·패키지 설계, 인터랙터/경계/프레젠터/게이트웨이 작성·리뷰 시 명시 호출(bcc:clean). 공통 Java 규칙(이디엄·네이밍·테스트·Spring·분해)은 bcc:conventions 스킬이 담당한다.
 ---
 
 # 클린 아키텍처(Uncle Bob) 계층 규칙
 
 > 이 스킬은 **클린 아키텍처 계층 구조**만 다룬다. 모던 이디엄·네이밍·테스트·Spring·기능 분해
-> 등 공통 규칙은 `java-code-consultant` 스킬을 함께 적용한다(자바 코드 작업 시 자동 발동).
-> 포트&어댑터(2면 대칭) 스타일이면 `hexagonal` 스킬을 쓴다 — 아래 "헥사고날과의 차이" 참조.
+> 등 공통 규칙은 `bcc:conventions` 스킬을 함께 적용한다(자바 코드 작업 시 자동 발동).
+> 포트&어댑터(2면 대칭) 스타일이면 `bcc:hexagonal` 스킬을 쓴다 — 아래 "헥사고날과의 차이" 참조.
 
 ## 의존성 규칙 (The Dependency Rule)
 

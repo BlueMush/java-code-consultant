@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.4.1 — 2026-07-21
+
+- **플러그인 이름 변경(호출 접두어 단축): `java-code-consultant` → `bcc`** (Bluemush Coding
+  Consultant). 호출: `bcc:conventions`, `bcc:hexagonal`, `bcc:clean`, `/bcc:review`.
+  - **BREAKING**: 기존 `java-code-consultant:*` 호출은 더 이상 동작하지 않는다. 재설치 필요:
+    `/plugin install bcc@java-code-consultant`.
+- 메인 스킬 이름 변경: `java-code-consultant` → `conventions` (호출 `bcc:conventions`).
+  이중 이름(`java-code-consultant:java-code-consultant`) 해소.
+- 마켓플레이스명·저장소(BlueMush/java-code-consultant)·소스 디렉토리 경로는 유지.
+- SKILL/커맨드/README의 호출·스킬 참조를 `bcc:` 로 갱신.
+
 ## 0.4.0 — 2026-07-21
 
 - **아키텍처별 스킬 분리.** 계층 규칙을 아키텍처별 스킬로 나눠 호출 시 선택하게 함:

@@ -1,14 +1,14 @@
 ---
 name: hexagonal
 description: 헥사고날(포트&어댑터) 아키텍처 계층 규칙 — 패키지 구조, UseCase/OutPort/Adapter/DTO 분리, 가시성·경계 강제. Hexagonal (ports & adapters) layer conventions.
-when_to_use: 프로젝트가 헥사고날/포트&어댑터 구조일 때 계층·패키지 설계, 포트/어댑터/유스케이스/DTO 클래스 작성·리뷰 시 명시 호출(java-code-consultant:hexagonal). 공통 Java 규칙(이디엄·네이밍·테스트·Spring·분해)은 java-code-consultant 스킬이 담당한다.
+when_to_use: 프로젝트가 헥사고날/포트&어댑터 구조일 때 계층·패키지 설계, 포트/어댑터/유스케이스/DTO 클래스 작성·리뷰 시 명시 호출(bcc:hexagonal). 공통 Java 규칙(이디엄·네이밍·테스트·Spring·분해)은 bcc:conventions 스킬이 담당한다.
 ---
 
 # 헥사고날(포트 & 어댑터) 계층 규칙
 
 > 이 스킬은 **헥사고날 계층 구조**만 다룬다. 모던 이디엄·네이밍·테스트·Spring·기능 분해 등
-> 공통 규칙은 `java-code-consultant` 스킬을 함께 적용한다(자바 코드 작업 시 자동 발동).
-> 프로젝트가 Uncle Bob 클린 아키텍처(entity/usecase/adapter/framework 4계층)라면 `clean` 스킬을 쓴다.
+> 공통 규칙은 `bcc:conventions` 스킬을 함께 적용한다(자바 코드 작업 시 자동 발동).
+> 프로젝트가 Uncle Bob 클린 아키텍처(entity/usecase/adapter/framework 4계층)라면 `bcc:clean` 스킬을 쓴다.
 
 의존 방향은 항상 **바깥→안**: adapter → application → domain. 반대 방향 참조는 컴파일부터 막는다.
 
@@ -112,7 +112,7 @@ public record IssueCouponCommand(String couponId, long memberId) {
   반드시 처리하게 만든다. 특히 **반환 타입 자체가 `Optional`**이어야 하며, 구현이
   `.orElse(null)`이나 센티넬(예: 없으면 `0`)로 무너뜨리게 두지 않는다 — 정상값과 부재값이
   충돌하면(예: 실제 `0`과 "없음") 인증·금액 핫패스에서 오판을 만든다. `find`(Optional) 대
-  `get`(예외) 구분은 java-code-consultant 스킬 naming.md의 동사 사전을 따른다.
+  `get`(예외) 구분은 bcc:conventions 스킬 naming.md의 동사 사전을 따른다.
 
 ```java
 public interface LoadCouponOutPort {
@@ -125,7 +125,7 @@ public interface LoadCouponOutPort {
 - persistence: `XxxPersistenceAdapter`가 관련 OutPort 여러 개를 구현해도 된다(포트는 좁게,
   구현은 모아서). **JPA 엔티티(`XxxJpaEntity`)는 adapter 밖으로 절대 내보내지 않는다** —
   도메인↔엔티티 변환 매퍼(`XxxMapper`)를 함께 둔다.
-- external api: `XxxApiAdapter` + RestClient, 타임아웃 명시(java-code-consultant 스킬 spring-boot.md HTTP 클라이언트 절).
+- external api: `XxxApiAdapter` + RestClient, 타임아웃 명시(bcc:conventions 스킬 spring-boot.md HTTP 클라이언트 절).
 - 어댑터에 비즈니스 로직 금지 — 변환과 I/O만. if 분기가 늘면 로직이 새고 있다는 신호.
 
 ## DTO 규칙 (계층별 접미사)

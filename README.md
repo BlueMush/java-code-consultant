@@ -8,7 +8,7 @@ Claude Code에서:
 
 ```
 /plugin marketplace add BlueMush/java-code-consultant
-/plugin install java-code-consultant@java-code-consultant
+/plugin install bcc@java-code-consultant
 ```
 
 (로컬 체크아웃을 쓰는 경우 `add` 뒤에 repo 경로를 넣어도 된다:
@@ -18,7 +18,7 @@ Claude Code에서:
 
 | 플러그인 | 설명 |
 |---|---|
-| [java-code-consultant](plugins/java-code-consultant/) | Java 21 코드 작성규칙 — 모던 이디엄, JUnit5+AssertJ 테스트 컨벤션, Spring Boot 3.5 관례, 기능 분해 기준 + `/java-code-consultant:review` 리뷰 커맨드 |
+| [bcc](plugins/java-code-consultant/) | Java 21 코드 작성규칙(`bcc:conventions`) + 아키텍처 계층 스킬(`bcc:hexagonal` · `bcc:clean`) + `/bcc:review` 리뷰 커맨드 |
 
 ## 개발
 

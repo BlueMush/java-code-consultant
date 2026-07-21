@@ -1,8 +1,8 @@
 # 계층 원칙 (아키텍처 무관 개요)
 
 > 구체 패키지 구조·클래스 분리·가시성 규칙은 프로젝트 아키텍처에 맞춰 **아키텍처 스킬을 명시
-> 호출**한다: 포트&어댑터면 `java-code-consultant:hexagonal`, Uncle Bob 클린 아키텍처면
-> `java-code-consultant:clean`. 이 파일은 두 방식에 공통인 원칙만 담는다.
+> 호출**한다: 포트&어댑터면 `bcc:hexagonal`, Uncle Bob 클린 아키텍처면
+> `bcc:clean`. 이 파일은 두 방식에 공통인 원칙만 담는다.
 
 ## 공통 원칙
 

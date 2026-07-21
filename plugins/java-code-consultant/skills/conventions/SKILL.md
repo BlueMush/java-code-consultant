@@ -1,5 +1,5 @@
 ---
-name: java-code-consultant
+name: conventions
 description: Java 21 코드 작성규칙. Java 코드를 작성·리뷰·리팩터링할 때 적용 — 모던 이디엄(record/sealed/pattern matching), JUnit5+AssertJ+Mockito 테스트 컨벤션, Spring Boot 3.5 관례, 기능 분해 기준.
 when_to_use: 자바/Spring 코드 작성, .java 파일 생성·수정, 테스트 작성, 코드 리뷰, 리팩터링 요청 시. Use when writing, reviewing, or refactoring any Java code (Java 21, Spring Boot 3.5, JUnit 5 + AssertJ + Mockito).
 ---
@@ -19,8 +19,8 @@ Java 코드를 **작성·수정·리뷰**할 때 아래 규칙을 적용한다. 
 | 메서드·클래스·패키지 구조 설계, 리팩터링 | [references/decomposition.md](references/decomposition.md) |
 
 > **아키텍처 계층의 구체 규칙**(패키지 트리·포트/어댑터 또는 4계층 클래스 분리·가시성)은 프로젝트
-> 아키텍처에 맞는 스킬을 **명시 호출**한다 — 포트&어댑터면 `java-code-consultant:hexagonal`,
-> Uncle Bob 클린 아키텍처면 `java-code-consultant:clean`. 위 `layers.md`는 두 방식 공통 원칙만 담는다.
+> 아키텍처에 맞는 스킬을 **명시 호출**한다 — 포트&어댑터면 `bcc:hexagonal`,
+> Uncle Bob 클린 아키텍처면 `bcc:clean`. 위 `layers.md`는 두 방식 공통 원칙만 담는다.
 
 ## 핵심 규칙 (항상 적용)
 
