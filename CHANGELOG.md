@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.3.2 — 2026-07-21
+
+- `references/layers.md` "가시성(접근제한자)·경계 강제" 절 신규 — 계층별 기본 가시성(포트·record
+  =public, 구현·어댑터=은닉), Service 가시성은 배선 방식에 종속. **철칙: 접근제한자 은닉 또는
+  아키텍처 테스트 중 하나로 경계를 강제하지 않은 `public` 구현 = 위반.** 무의존 서비스 +
+  `TransactionTemplate` 배선 tx 경계 패턴 명시. 기존 "Service 가능하면 package-private" /
+  "트랜잭션 경계=Service public 메서드" 문구를 배선 종속으로 정정.
+- `references/layers.md` OutPort 반환 규칙 보강 — 단건 부재는 `Optional`(또는 `get`+예외),
+  `null`·원시 센티넬(0/-1)로 부재를 숨기지 않는다. 반환 타입 자체가 `Optional`이어야 하며
+  구현이 `.orElse(null)`로 무너뜨리지 않게(인증·금액 핫패스 오판 방지).
+- `SKILL.md` 리뷰 절 — 스켈레톤/인터페이스 우선 PR에서 "구현 미완"은 위반 아님, 계약(반환
+  타입·record 불변·네이밍·포트 도메인타입)만 지적.
+- `commands/review.md` — `/review` 인자가 GitHub PR URL/번호면 `gh`로 변경 `.java` 수집·codegen
+  제외·head SHA 실줄번호 인용·대량 PR 클러스터 분할.
+- 근거: 실 PR(헥사고날 member 모듈) 리뷰에서 드러난 스킬-실코드 갭.
+
 ## 0.3.1 — 2026-07-16
 
 - `references/spring-boot.md` 트랜잭션 절 보강 — checked `Exception`은 기본 롤백되지 않고 커밋되는

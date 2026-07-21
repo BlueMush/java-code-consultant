@@ -81,10 +81,12 @@ public record IssueCouponCommand(String couponId, long memberId) {
 
 - UseCase 구현체. 이름은 `동사+명사+Service`(`IssueCouponService`) — **유스케이스당 서비스 하나**가
   기본. 한 서비스가 여러 UseCase를 구현하기 시작하면 책임 과다 신호.
-- 클래스는 가능하면 **package-private** — 외부 계층은 인터페이스로만 접근한다.
+- 클래스 가시성은 **배선 방식에 종속**한다(아래 "가시성·경계 강제" 절) — 어느 경우든 외부
+  계층은 인터페이스(포트)로만 접근한다.
 - 역할은 오케스트레이션만: OutPort 로드 → 도메인 로직 호출 → OutPort 저장 → Result 변환.
   비즈니스 규칙(할인 판정, 상태 전이)은 도메인 객체에 있어야 한다.
-- 트랜잭션 경계 = Service public 메서드 (spring-boot.md 트랜잭션 절 준수).
+- 트랜잭션 경계 = 유스케이스 실행 단위. 서비스의 `@Transactional`(스프링 빈일 때) **또는**
+  배선의 `TransactionTemplate` 래핑(프레임워크 무의존 서비스일 때) — "가시성·경계 강제" 절 참조.
 - **Service가 다른 UseCase/Service를 호출하지 않는다**(호출 사슬 금지). 공통 로직은 도메인
   서비스나 별도 컴포넌트로 내려 양쪽이 쓰게 한다.
 
@@ -95,7 +97,12 @@ public record IssueCouponCommand(String couponId, long memberId) {
 - 시그니처는 도메인 타입만. JPA 엔티티·외부 API DTO·`Pageable` 같은 기술 타입 노출 금지.
 - 조회(Load)와 저장(Save)을 분리하고 메서드를 좁게 유지한다. 메서드 10개짜리
   "만능 Repository 포트"는 계층만 늘린 가짜 추상화다.
-- 반환 규칙: 단건 부재 가능이면 `Optional`, 목록은 빈 리스트(never null).
+- 반환 규칙: **단건 부재는 `Optional`(또는 `get`+예외) — `null`·원시 센티넬(0/-1)로 부재를
+  숨기지 않는다.** 목록은 빈 리스트(never null). 부재 가능성을 시그니처에 드러내 호출자가
+  반드시 처리하게 만든다. 특히 **반환 타입 자체가 `Optional`**이어야 하며, 구현이
+  `.orElse(null)`이나 센티넬(예: 없으면 `0`)로 무너뜨리게 두지 않는다 — 정상값과 부재값이
+  충돌하면(예: 실제 `0`과 "없음") 인증·금액 핫패스에서 오판을 만든다. `find`(Optional) 대
+  `get`(예외) 구분은 naming.md의 동사 사전을 따른다.
 
 ```java
 public interface LoadCouponOutPort {
@@ -125,3 +132,39 @@ public interface LoadCouponOutPort {
   Response를 유스케이스가 반환하기. 변환 코드 몇 줄은 계층 보호의 값싼 보험이다.
 - 변환 메서드 위치 규칙: 바깥 계층이 변환을 소유한다 — `request.toCommand(...)`(인스턴스),
   `Response.from(result)`(정적 팩토리). 안쪽 계층은 바깥 DTO의 존재를 모른다.
+
+## 가시성(접근제한자) · 경계 강제
+
+계층 경계는 **컴파일러(접근제한자) 또는 아키텍처 테스트로 반드시 강제**한다. 둘 중 아무것도
+없이 구현 클래스가 `public`이면 포트를 우회한 직접 호출을 막을 수 없으므로 위반이다.
+
+| 요소 | 기본 가시성 |
+|---|---|
+| UseCase·OutPort 인터페이스(포트) | `public` — 헥사곤의 공개 API |
+| Command·Query·Result·Response·View record | `public` — 포트 계약으로 계층 경계를 넘음 |
+| Service(UseCase 구현) | **배선 방식에 종속**(아래) |
+| Adapter(`adapter/out/*`, `adapter/in/web`) | package-private + 포트로만 노출 |
+| 도메인 모델 | 모듈 내 `public`, 내부 필드·보조 타입은 `private`/`final` |
+
+**Service 가시성은 배선이 결정한다:**
+- 중앙 `@Configuration`이 `new XxxService(...)`로 배선하는 경우 → 서비스는 `public` 불가피.
+  이때 계층 경계는 **아키텍처 테스트(ArchUnit·소스 정적 스캔)로 강제**한다.
+- 패키지별 `@Configuration`, 또는 `@UseCase`/`@WebAdapter` 같은 스테레오타입 + 컴포넌트 스캔
+  → 서비스를 **package-private으로 둘 수 있다**(호출자는 포트로만 접근).
+- **철칙: 둘 중 하나(접근제한자 은닉 or 아키텍처 테스트)는 반드시 갖춘다.** `public` 구현 +
+  경계 강제 장치 없음 = 위반.
+
+**트랜잭션 경계와의 연결:** 프레임워크 무의존 서비스를 중앙 배선하면, tx 경계를 서비스의
+`@Transactional`이 아니라 배선에서 `TransactionTemplate`로 유스케이스 호출을 감싸 둔다.
+리뷰 시 서비스에 `@Transactional`이 없다고 곧바로 원자성 위반으로 보지 말고, **배선의 tx
+래핑(또는 서비스 `@Transactional`) 존재를 먼저 확인**한다 — 어느 쪽도 없을 때만 위반이다.
+
+```java
+// 중앙 배선 예: 무의존 서비스 + TransactionTemplate 로 tx 경계 부여
+@Bean
+IssueCouponUseCase issueCouponUseCase(LoadCouponOutPort load, SaveCouponOutPort save,
+                                      TransactionTemplate tx) {
+    var service = new IssueCouponService(load, save);          // 서비스는 스프링 무의존
+    return cmd -> tx.execute(status -> service.issue(cmd));    // 배선이 tx 경계를 부여
+}
+```
