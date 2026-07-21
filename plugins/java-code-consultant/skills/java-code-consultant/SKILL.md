@@ -14,9 +14,13 @@ Java 코드를 **작성·수정·리뷰**할 때 아래 규칙을 적용한다. 
 | 클래스·도메인 모델·비즈니스 로직 작성 | [references/java21-idioms.md](references/java21-idioms.md) |
 | 테스트 작성·수정 | [references/testing.md](references/testing.md) |
 | Spring 설정·트랜잭션·예외 처리·HTTP 클라이언트 | [references/spring-boot.md](references/spring-boot.md) |
-| Controller/UseCase/Service/OutPort/Adapter/DTO 작성 | [references/layers.md](references/layers.md) |
+| 계층 원칙(의존 방향·DTO·경계) — 개요 | [references/layers.md](references/layers.md) |
 | 클래스·메서드·변수 이름 짓기 | [references/naming.md](references/naming.md) |
 | 메서드·클래스·패키지 구조 설계, 리팩터링 | [references/decomposition.md](references/decomposition.md) |
+
+> **아키텍처 계층의 구체 규칙**(패키지 트리·포트/어댑터 또는 4계층 클래스 분리·가시성)은 프로젝트
+> 아키텍처에 맞는 스킬을 **명시 호출**한다 — 포트&어댑터면 `java-code-consultant:hexagonal`,
+> Uncle Bob 클린 아키텍처면 `java-code-consultant:clean`. 위 `layers.md`는 두 방식 공통 원칙만 담는다.
 
 ## 핵심 규칙 (항상 적용)
 

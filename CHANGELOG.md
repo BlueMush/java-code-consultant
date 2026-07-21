@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.4.0 — 2026-07-21
+
+- **아키텍처별 스킬 분리.** 계층 규칙을 아키텍처별 스킬로 나눠 호출 시 선택하게 함:
+  - `java-code-consultant:hexagonal` (신규) — 포트&어댑터 계층 규칙(기존 layers.md 상세 이관).
+  - `java-code-consultant:clean` (신규) — Uncle Bob 클린 아키텍처 4계층(entity/usecase/adapter/
+    framework)·입출력 경계·프레젠터·게이트웨이. 헥사고날과의 차이·선택 기준 포함.
+  - 두 스킬은 자기완결. 공통 규칙(이디엄·네이밍·테스트·Spring·분해)은 `java-code-consultant`
+    스킬(자동 발동)이 담당한다.
+- 공통 스킬 `references/layers.md`를 **아키텍처 무관 계층 원칙 개요**로 슬림화 + 아키텍처 스킬
+  명시 호출 안내. SKILL.md 표에 아키텍처 스킬 선택 가이드 추가.
+- `commands/review.md` — 리뷰 시 프로젝트 아키텍처를 판별해 `:hexagonal`/`:clean` 스킬도 함께
+  로드하도록 명시.
+- 이름 관례: 스킬명은 ASCII 케밥(`hexagonal`/`clean`), 설명은 한글(한글 식별자는 미지원).
+
 ## 0.3.3 — 2026-07-21
 
 - `commands/review.md` 재정의 — `/review`를 **규약 준수(conformance) 리뷰**로 전환. 모든 지적은
