@@ -164,6 +164,23 @@ public interface LoadCouponOutPort {
 - **철칙: 둘 중 하나(접근제한자 은닉 or 아키텍처 테스트)는 반드시 갖춘다.** `public` 구현 +
   경계 강제 장치 없음 = 위반.
 
+**권장 기본 배선: `@UseCase`/`@WebAdapter`/`@PersistenceAdapter` 스테레오타입 + 컴포넌트 스캔 +
+package-private 구현.** 배선 보일러플레이트 없이 구현체를 숨겨 컴파일러가 포트 우회 호출을 막는다
+(가장 강한 보호). Spring이 리플렉션으로 생성하므로 package-private 클래스·생성자도 문제없고,
+`@Transactional`은 인터페이스(JDK) 프록시로 걸린다. 중앙 `@Configuration`+`new` 배선은 도메인을
+완전 프레임워크 무의존으로 둘 때의 **대안**이며, 그 경우 구현체가 `public`이 되므로 아키텍처
+테스트가 필수다.
+
+```java
+@UseCase                                   // = @Component 메타애노테이션(common 패키지에 1회 정의)
+class IssueCouponService implements IssueCouponUseCase {          // package-private → 은닉
+    IssueCouponService(LoadCouponOutPort load, SaveCouponOutPort save) { ... }  // 생성자 주입
+    @Override @Transactional
+    public IssueCouponResult issue(IssueCouponCommand c) { ... }  // 구현 메서드는 public(오버라이드 규칙)
+    private long calcDiscount(...) { ... }                        // 헬퍼는 private
+}
+```
+
 **트랜잭션 경계와의 연결:** 프레임워크 무의존 서비스를 중앙 배선하면, tx 경계를 서비스의
 `@Transactional`이 아니라 배선에서 `TransactionTemplate`로 유스케이스 호출을 감싸 둔다.
 리뷰 시 서비스에 `@Transactional`이 없다고 곧바로 원자성 위반으로 보지 말고, **배선의 tx

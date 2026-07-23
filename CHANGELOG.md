@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.2 — 2026-07-23
+
+- `bcc:hexagonal`·`bcc:clean` "가시성·경계 강제" 절에 **권장 기본 배선** 명시: `@UseCase` 등
+  스테레오타입 + 컴포넌트 스캔 + **package-private 구현**(보일러플레이트 0, 컴파일러가 경계 강제,
+  `@Transactional`은 인터페이스 프록시). 중앙 `@Configuration`+`new`(구현체 public + 아키텍처
+  테스트 필수)는 대안으로 정리.
+- `.claude-plugin/marketplace.json`에 `renames: {java-code-consultant: bcc}` 추가 — 0.4.0
+  이하에서 `java-code-consultant`로 설치한 사용자의 키를 `bcc`로 자동 마이그레이션.
+
 ## 0.4.1 — 2026-07-21
 
 - **플러그인 이름 변경(호출 접두어 단축): `java-code-consultant` → `bcc`** (Bluemush Coding

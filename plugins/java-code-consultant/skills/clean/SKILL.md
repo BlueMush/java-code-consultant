@@ -114,6 +114,22 @@ public record PlaceOrderCommand(long memberId, List<Long> lineItemIds) {
 - 패키지별 `@Configuration`, 또는 커스텀 스테레오타입 + 컴포넌트 스캔 → 구현체 **package-private 가능**.
 - **철칙: 둘 중 하나(접근제한자 은닉 or 아키텍처 테스트)는 반드시 갖춘다.**
 
+**권장 기본 배선: 스테레오타입(`@UseCase` 등) + 컴포넌트 스캔 + package-private 구현.** 배선
+보일러플레이트 없이 인터랙터를 숨겨 컴파일러가 경계를 강제한다. Spring이 리플렉션으로 생성하므로
+package-private도 문제없고, `@Transactional`은 인터페이스(JDK) 프록시로 걸린다. 중앙
+`@Configuration`+`new`는 완전 프레임워크 무의존이 목표일 때의 **대안**이며, 그 경우 구현체가
+`public`이 되어 아키텍처 테스트가 필수다.
+
+```java
+@UseCase
+class PlaceOrderInteractor implements PlaceOrderInputBoundary {   // package-private → 은닉
+    PlaceOrderInteractor(LoadOrderGateway load, SaveOrderGateway save) { ... }  // 생성자 주입
+    @Override @Transactional
+    public void place(PlaceOrderCommand c) { ... }               // 구현 메서드는 public(오버라이드 규칙)
+    private void applyPolicy(...) { ... }                        // 헬퍼는 private
+}
+```
+
 **트랜잭션 경계:** 인터랙터가 스프링 빈이면 `@Transactional`, 프레임워크 무의존 인터랙터를 중앙
 배선하면 배선에서 `TransactionTemplate`로 감싼다. 리뷰 시 `@Transactional` 부재를 곧바로 원자성
 위반으로 보지 말고 배선의 tx 래핑을 먼저 확인한다 — 어느 쪽도 없을 때만 위반.
