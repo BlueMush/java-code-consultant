@@ -164,34 +164,43 @@ public interface LoadCouponOutPort {
 - **철칙: 둘 중 하나(접근제한자 은닉 or 아키텍처 테스트)는 반드시 갖춘다.** `public` 구현 +
   경계 강제 장치 없음 = 위반.
 
-**권장 기본 배선: `@UseCase`/`@WebAdapter`/`@PersistenceAdapter` 스테레오타입 + 컴포넌트 스캔 +
-package-private 구현.** 배선 보일러플레이트 없이 구현체를 숨겨 컴파일러가 포트 우회 호출을 막는다
-(가장 강한 보호). Spring이 리플렉션으로 생성하므로 package-private 클래스·생성자도 문제없고,
-`@Transactional`은 인터페이스(JDK) 프록시로 걸린다. 중앙 `@Configuration`+`new` 배선은 도메인을
-완전 프레임워크 무의존으로 둘 때의 **대안**이며, 그 경우 구현체가 `public`이 되므로 아키텍처
-테스트가 필수다.
+**배선 방식은 application 모듈의 스프링 의존 정책이 가른다.**
+
+### 팀 표준 — application 모듈이 순수 자바(스프링 無)일 때 (B방식)
+- 배선은 스프링 있는 모듈(bootstrap)의 **중앙 `@Configuration`** 이 맡는다.
+- 구현체를 **package-private으로 유지**하려면 application 패키지 안에 **public 팩토리(seam)** 를 두고,
+  배선은 팩토리만 호출한다 — 구현체 이름을 바깥 모듈에서 참조하지 않으므로 은닉이 유지된다.
+- 트랜잭션은 서비스의 `@Transactional`이 아니라 **`TransactionTemplate`** 로 유스케이스 호출을 감싼다.
+  (순수 자바 서비스엔 `@Transactional`을 붙일 수 없고, 붙여도 스프링 프록시가 없어 **무효**다.)
+- 경계는 접근제한자(package-private) + **ArchUnit**(adapter→application.service import 금지)로 이중 강제.
 
 ```java
-@UseCase                                   // = @Component 메타애노테이션(common 패키지에 1회 정의)
+// application 모듈(순수 자바): 구현 package-private, 팩토리 public(같은 패키지)
 class IssueCouponService implements IssueCouponUseCase {          // package-private → 은닉
-    IssueCouponService(LoadCouponOutPort load, SaveCouponOutPort save) { ... }  // 생성자 주입
-    @Override @Transactional
-    public IssueCouponResult issue(IssueCouponCommand c) { ... }  // 구현 메서드는 public(오버라이드 규칙)
-    private long calcDiscount(...) { ... }                        // 헬퍼는 private
+    IssueCouponService(LoadCouponOutPort load, SaveCouponOutPort save) { ... }
+    @Override public IssueCouponResult issue(IssueCouponCommand c) { ... }  // @Transactional 없음(순수 자바)
+    private long calcDiscount(...) { ... }
 }
-```
+public final class CouponUseCaseFactory {                         // public seam
+    private CouponUseCaseFactory() {}
+    public static IssueCouponUseCase issueCoupon(LoadCouponOutPort l, SaveCouponOutPort s) {
+        return new IssueCouponService(l, s);                      // 같은 패키지라 package-private 생성 가능
+    }
+}
 
-**트랜잭션 경계와의 연결:** 프레임워크 무의존 서비스를 중앙 배선하면, tx 경계를 서비스의
-`@Transactional`이 아니라 배선에서 `TransactionTemplate`로 유스케이스 호출을 감싸 둔다.
-리뷰 시 서비스에 `@Transactional`이 없다고 곧바로 원자성 위반으로 보지 말고, **배선의 tx
-래핑(또는 서비스 `@Transactional`) 존재를 먼저 확인**한다 — 어느 쪽도 없을 때만 위반이다.
-
-```java
-// 중앙 배선 예: 무의존 서비스 + TransactionTemplate 로 tx 경계 부여
+// bootstrap 모듈(스프링): 팩토리 호출 + TransactionTemplate로 tx 경계
 @Bean
-IssueCouponUseCase issueCouponUseCase(LoadCouponOutPort load, SaveCouponOutPort save,
-                                      TransactionTemplate tx) {
-    var service = new IssueCouponService(load, save);          // 서비스는 스프링 무의존
-    return cmd -> tx.execute(status -> service.issue(cmd));    // 배선이 tx 경계를 부여
+IssueCouponUseCase issueCouponUseCase(LoadCouponOutPort l, SaveCouponOutPort s, TransactionTemplate tx) {
+    IssueCouponUseCase uc = CouponUseCaseFactory.issueCoupon(l, s);
+    return cmd -> tx.execute(status -> uc.issue(cmd));           // 조회는 readOnly 템플릿, void는 executeWithoutResult
 }
 ```
+
+### 대안 — application 모듈이 스프링 의존을 허용할 때
+`@UseCase`/`@WebAdapter`/`@PersistenceAdapter` 스테레오타입 + 컴포넌트 스캔 + package-private 구현.
+배선 보일러플레이트 없이 Spring이 리플렉션으로 생성하고 `@Transactional`(Boot 기본 CGLIB 프록시)이
+걸린다. application에 spring-context/tx 의존이 스며드는 것을 감수할 때의 선택.
+
+**리뷰 주의:** 서비스에 `@Transactional`이 없다고 곧바로 원자성 위반으로 보지 말 것 — B방식은 tx가
+**배선의 `TransactionTemplate`** 에 있다. 배선의 tx 래핑(또는 스프링 서비스면 `@Transactional`) 존재를
+먼저 확인하고, 어느 쪽도 없을 때만 위반이다.

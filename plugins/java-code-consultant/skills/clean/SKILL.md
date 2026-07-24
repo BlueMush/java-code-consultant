@@ -114,25 +114,44 @@ public record PlaceOrderCommand(long memberId, List<Long> lineItemIds) {
 - 패키지별 `@Configuration`, 또는 커스텀 스테레오타입 + 컴포넌트 스캔 → 구현체 **package-private 가능**.
 - **철칙: 둘 중 하나(접근제한자 은닉 or 아키텍처 테스트)는 반드시 갖춘다.**
 
-**권장 기본 배선: 스테레오타입(`@UseCase` 등) + 컴포넌트 스캔 + package-private 구현.** 배선
-보일러플레이트 없이 인터랙터를 숨겨 컴파일러가 경계를 강제한다. Spring이 리플렉션으로 생성하므로
-package-private도 문제없고, `@Transactional`은 인터페이스(JDK) 프록시로 걸린다. 중앙
-`@Configuration`+`new`는 완전 프레임워크 무의존이 목표일 때의 **대안**이며, 그 경우 구현체가
-`public`이 되어 아키텍처 테스트가 필수다.
+**배선 방식은 usecase 모듈의 스프링 의존 정책이 가른다.**
+
+### 팀 표준 — usecase 모듈이 순수 자바(스프링 無)일 때 (B방식)
+- 배선은 스프링 있는 모듈(bootstrap)의 **중앙 `@Configuration`** 이 맡는다.
+- 인터랙터를 **package-private으로 유지**하려면 usecase 패키지에 **public 팩토리(seam)** 를 두고
+  배선은 팩토리만 호출한다.
+- 트랜잭션은 `@Transactional`이 아니라 **`TransactionTemplate`** 로 유스케이스 호출을 감싼다(순수 자바
+  인터랙터엔 `@Transactional`이 무효).
+- 경계는 package-private + **ArchUnit**로 이중 강제.
 
 ```java
-@UseCase
+// usecase 모듈(순수 자바): 인터랙터 package-private, 팩토리 public(같은 패키지)
 class PlaceOrderInteractor implements PlaceOrderInputBoundary {   // package-private → 은닉
-    PlaceOrderInteractor(LoadOrderGateway load, SaveOrderGateway save) { ... }  // 생성자 주입
-    @Override @Transactional
-    public void place(PlaceOrderCommand c) { ... }               // 구현 메서드는 public(오버라이드 규칙)
-    private void applyPolicy(...) { ... }                        // 헬퍼는 private
+    PlaceOrderInteractor(LoadOrderGateway load, SaveOrderGateway save) { ... }
+    @Override public void place(PlaceOrderCommand c) { ... }      // @Transactional 없음(순수 자바)
+    private void applyPolicy(...) { ... }
+}
+public final class OrderUseCaseFactory {                          // public seam
+    private OrderUseCaseFactory() {}
+    public static PlaceOrderInputBoundary placeOrder(LoadOrderGateway l, SaveOrderGateway s) {
+        return new PlaceOrderInteractor(l, s);
+    }
+}
+
+// bootstrap 모듈(스프링)
+@Bean
+PlaceOrderInputBoundary placeOrder(LoadOrderGateway l, SaveOrderGateway s, TransactionTemplate tx) {
+    PlaceOrderInputBoundary uc = OrderUseCaseFactory.placeOrder(l, s);
+    return cmd -> tx.executeWithoutResult(status -> uc.place(cmd));   // void라 executeWithoutResult
 }
 ```
 
-**트랜잭션 경계:** 인터랙터가 스프링 빈이면 `@Transactional`, 프레임워크 무의존 인터랙터를 중앙
-배선하면 배선에서 `TransactionTemplate`로 감싼다. 리뷰 시 `@Transactional` 부재를 곧바로 원자성
-위반으로 보지 말고 배선의 tx 래핑을 먼저 확인한다 — 어느 쪽도 없을 때만 위반.
+### 대안 — usecase 모듈이 스프링 의존을 허용할 때
+스테레오타입(`@UseCase` 등) + 컴포넌트 스캔 + package-private 인터랙터 + `@Transactional`.
+배선 보일러플레이트 없음(대신 usecase 모듈이 spring 의존을 가짐).
+
+**리뷰 주의:** `@Transactional` 부재를 곧바로 원자성 위반으로 보지 말 것 — B방식은 tx가 배선의
+`TransactionTemplate`에 있다. 배선 tx 래핑 존재를 먼저 확인하고 어느 쪽도 없을 때만 위반.
 
 ## 헥사고날과의 차이 (선택 기준)
 

@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.3 — 2026-07-24
+
+- `bcc:hexagonal`·`bcc:clean` 배선 절 개정 — **팀 표준을 "순수 자바 application 모듈 + 중앙 배선"(B방식)**
+  으로 명시: application 패키지의 **public 팩토리(seam)** 로 구현체 package-private 유지 + 중앙
+  `@Configuration` 배선 + **`TransactionTemplate`** 트랜잭션 경계 + ArchUnit 경계 강제. `@Transactional`은
+  순수 자바 서비스에서 무효임을 명시. 스테레오타입 스캔(+`@Transactional`)은 "application이 스프링
+  의존을 허용할 때"의 대안으로 재배치(0.4.2에서 스캔을 기본으로 둔 것을 순수 자바 모듈 전제에 맞게 정정).
+
 ## 0.4.2 — 2026-07-23
 
 - `bcc:hexagonal`·`bcc:clean` "가시성·경계 강제" 절에 **권장 기본 배선** 명시: `@UseCase` 등
